@@ -3,7 +3,9 @@ import win32ui
 import win32con
 import win32api
 
+
 from datetime import datetime
+from PIL import Image
 
 '''
    https://msdn.microsoft.com/en-us/library/windows/desktop/dd183402(v=vs.85).aspx
@@ -15,7 +17,7 @@ from datetime import datetime
 
 # Grab the width, Height, and Top Left of the screen -- This is for ALL monitors
 # https://msdn.microsoft.com/en-us/library/windows/desktop/ms724385(v=vs.85).aspx
-def save_picture(savedir):
+def save_picture(savedir, as_png):
     width = win32api.GetSystemMetrics(win32con.SM_CXVIRTUALSCREEN)
     height = win32api.GetSystemMetrics(win32con.SM_CYVIRTUALSCREEN)
     left = win32api.GetSystemMetrics(win32con.SM_XVIRTUALSCREEN)
@@ -50,7 +52,18 @@ def save_picture(savedir):
     date = str(datetime.now())
     filename = date[:10] + ' at ' + date[11:19].replace(':', '.')
     # save the bitmap to a file
-    screen.SaveBitmapFile(memdc, savedir + filename + '.bmp')
+    #print(screen.GetBitmapBits())
+    #print(screen.GetBitmapBits())
+    #img = Image.fromstring(screen.GetBitmapBits(True))
+    if not as_png:
+        screen.SaveBitmapFile(memdc, savedir + filename + '.bmp')
+    else:
+        info = screen.GetInfo()
+        size = (info['bmWidth'], info['bmHeight'])
+        buf = screen.GetBitmapBits(True)
+        img = Image.frombuffer('RGB', size, buf, 'raw', 'BGRX', 0, 1)
+        img.save(savedir + filename + '.png', 'png')
+    #screen.SaveBitmapFile(memdc, savedir + filename + '.bmp')
 
     # free objects
     memdc.DeleteDC()

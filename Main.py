@@ -1,7 +1,6 @@
 import wx
 import sys
 import WinKeyboard
-import Config
 
 class MainFrame(wx.Frame):
 
@@ -21,5 +20,4 @@ class MainFrame(wx.Frame):
     #app.MainLoop()
 
 # Start listening on keystrokes
-
 WinKeyboard.listener()

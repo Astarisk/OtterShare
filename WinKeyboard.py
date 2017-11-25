@@ -133,7 +133,7 @@ def listener():
         if event.name == 'z':
             sys.exit()
         if event.name == 'p':
-            Screenshot.save_picture(Config.save_location)
+            Screenshot.save_picture(Config.save_location, Config.save_as_png == 'True')
 
     def low_level_handler(nCode, wParam, lParam):
         #print(lParam.contents.vk_code)
