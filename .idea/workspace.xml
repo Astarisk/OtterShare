@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="e825b633-e952-4d67-8463-9f1b7afd68e0" name="Default" comment="">
-      <change type="DELETED" beforePath="$PROJECT_DIR$/../OtterShare/Screenshot" afterPath="" />
+    <list default="true" id="e825b633-e952-4d67-8463-9f1b7afd68e0" name="Default" comment="Adding">
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../OtterShare/Screenshot.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../OtterShare/.idea/workspace.xml" afterPath="$PROJECT_DIR$/../OtterShare/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../OtterShare/Main.py" afterPath="$PROJECT_DIR$/../OtterShare/Main.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -17,11 +18,45 @@
       <file leaf-file-name="Main.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/../OtterShare/Main.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="243">
-              <caret line="122" column="8" lean-forward="true" selection-start-line="122" selection-start-column="8" selection-end-line="122" selection-end-column="8" />
+            <state relative-caret-position="268">
+              <caret line="164" column="45" lean-forward="true" selection-start-line="164" selection-start-column="45" selection-end-line="164" selection-end-column="45" />
               <folding>
                 <element signature="e#0#9#0" expanded="true" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="WinKeyboard.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../OtterShare/WinKeyboard.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-1661">
+              <caret line="14" column="50" lean-forward="true" selection-start-line="14" selection-start-column="50" selection-end-line="14" selection-end-column="50" />
+              <folding>
+                <element signature="e#0#13#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Screenshot.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../OtterShare/Screenshot.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="255">
+              <caret line="15" column="17" lean-forward="false" selection-start-line="15" selection-start-column="17" selection-end-line="15" selection-end-column="17" />
+              <folding>
+                <element signature="e#0#15#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="KeyboardEvent.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../OtterShare/KeyboardEvent.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="136">
+              <caret line="8" column="0" lean-forward="true" selection-start-line="8" selection-start-column="0" selection-end-line="8" selection-end-column="0" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -35,6 +70,14 @@
       </list>
     </option>
   </component>
+  <component name="FindInProjectRecents">
+    <findStrings>
+      <find>UnhookWindowsHookEx</find>
+      <find>keyboardcallback</find>
+      <find>unhoo</find>
+      <find>LPMSG</find>
+    </findStrings>
+  </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/../OtterShare" />
   </component>
@@ -44,6 +87,9 @@
         <option value="$PROJECT_DIR$/Main.py" />
         <option value="$PROJECT_DIR$/../OtterShare/Screenshot" />
         <option value="$PROJECT_DIR$/../OtterShare/Notes.py" />
+        <option value="$PROJECT_DIR$/../OtterShare/KeyboardEvent.py" />
+        <option value="$PROJECT_DIR$/../OtterShare/WinKeyboard.py" />
+        <option value="$PROJECT_DIR$/../OtterShare/Screenshot.py" />
         <option value="$PROJECT_DIR$/../OtterShare/Main.py" />
       </list>
     </option>
@@ -246,7 +292,14 @@
       <option name="project" value="LOCAL" />
       <updated>1511573379511</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="Fixed file extension.">
+      <created>1511573539759</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1511573539759</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -280,7 +333,8 @@
     <MESSAGE value="Proof of concept, Saves a bmp of the screen to the desktop" />
     <MESSAGE value="Succesfully hooked into windows keyboard events.&#10;Moved the Screenshot code to another file." />
     <MESSAGE value="Added in basic key status and decoding." />
-    <option name="LAST_COMMIT_MESSAGE" value="Added in basic key status and decoding." />
+    <MESSAGE value="Fixed file extension." />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixed file extension." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -305,10 +359,38 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/../OtterShare/KeyboardEvent.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="136">
+          <caret line="8" column="0" lean-forward="true" selection-start-line="8" selection-start-column="0" selection-end-line="8" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../OtterShare/Screenshot.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="255">
+          <caret line="15" column="17" lean-forward="false" selection-start-line="15" selection-start-column="17" selection-end-line="15" selection-end-column="17" />
+          <folding>
+            <element signature="e#0#15#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../OtterShare/WinKeyboard.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-1661">
+          <caret line="14" column="50" lean-forward="true" selection-start-line="14" selection-start-column="50" selection-end-line="14" selection-end-column="50" />
+          <folding>
+            <element signature="e#0#13#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/../OtterShare/Main.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="243">
-          <caret line="122" column="8" lean-forward="true" selection-start-line="122" selection-start-column="8" selection-end-line="122" selection-end-column="8" />
+        <state relative-caret-position="268">
+          <caret line="164" column="45" lean-forward="true" selection-start-line="164" selection-start-column="45" selection-end-line="164" selection-end-column="45" />
           <folding>
             <element signature="e#0#9#0" expanded="true" />
           </folding>

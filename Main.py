@@ -12,6 +12,7 @@ import win32api
 import ctypes
 from ctypes import windll, byref, c_short, c_char, c_uint8, c_int32, c_int, c_uint, c_uint32, c_long, Structure, CFUNCTYPE, POINTER
 from ctypes.wintypes import WORD, DWORD, BOOL, HHOOK, MSG, LPWSTR, WCHAR, WPARAM, LPARAM, LONG, ULONG
+import Screenshot
 import atexit
 
 class MainFrame(wx.Frame):
@@ -38,6 +39,7 @@ user32 = ctypes.WinDLL('user32', use_last_error=True)
 
 ULONG_PTR = POINTER(ULONG)
 NULL = c_int(0)
+LPMSG = POINTER(MSG)
 
 WH_KEYBOARD_LL = c_int(13)  # WH_KEYBOARD_LL == 13
 
@@ -93,7 +95,23 @@ SetWindowsHookEx.restype = HHOOK  # restype sets the return type, by default it 
 CallNextHookEx = user32.CallNextHookEx
 CallNextHookEx.restype = c_int  # Keyboard events seem to return an int
 
+# BOOL WINAPI UnhookWindowsHookEx(_In_ HHOOK hhk);
+# https://msdn.microsoft.com/en-us/library/ms644993(v=vs.85).aspx
 UnhookWindowsHookEx = user32.UnhookWindowsHookEx
+UnhookWindowsHookEx.argtypes = [HHOOK]
+UnhookWindowsHookEx.restype = BOOL
+
+
+# Retrieves a message from the calling thread's message queue. The function dispatches incoming sent messages
+# until a posted message is available for retrieval.
+# https://msdn.microsoft.com/en-us/library/ms644936(v=vs.85).aspx
+GetMessage = user32.GetMessageW
+GetMessage.argtypes = [LPMSG, c_int, c_int, c_int]
+GetMessage.restype = BOOL
+
+PeekMessage = user32.PeekMessageW
+PeekMessage.argtypes = [LPMSG, c_int, c_int, c_int, c_int]
+PeekMessage.restype = BOOL
 
 #LRESULT CALLBACK LowLevelKeyboardProc(
 #  _In_ int    nCode, -- If nCode is less than zero, the hook procedure must pass the message to the CallNextHookEx
@@ -109,6 +127,10 @@ def low_level_handler(nCode, wParam, lParam):
         print('n: ' + str(nCode))
         print('w: ' + str(key_identifier[wParam]))
         print('l: ' + str(lParam) + ' ' + virtual_keys[lParam.contents.vk_code])
+        if virtual_keys[lParam.contents.vk_code] == 'z':
+            sys.exit()
+        if virtual_keys[lParam.contents.vk_code] == 'p':
+            Screenshot.save_picture()
 
     print("Call next hook")
     # TODO: Read the docs and make this CallNextHook proper
@@ -122,16 +144,32 @@ class KBDLLHOOKSTRUCT(ctypes.Structure):
                 ("time", c_int),
                 ("dwExtraInfo", ULONG_PTR)]
 
-
 LowLevelKeyboardProc = CFUNCTYPE(c_int, c_int, LPARAM, POINTER(KBDLLHOOKSTRUCT))
 keyboardcallback = LowLevelKeyboardProc(low_level_handler)
 
 # HHOOK WINAPI SetWindowsHookEx(_In_ int idHook, _In_ HOOKPROC lpfn, _In_ HINSTANCE hMod,_In_ DWORD dwThreadId)
+# https://msdn.microsoft.com/en-us/library/ms644990(v=vs.85).aspx
 keyboardhook = SetWindowsHookEx(WH_KEYBOARD_LL, keyboardcallback, NULL, NULL)
 
-# Unregister the hook at exit
-atexit.register(UnhookWindowsHookEx, keyboardcallback)
 
-while True:
-    msg = windll.user32.GetMessageW(None, 0, 0, 0)
+# Unregister the hook at exit, I hope this is working.
+def unhook_register():
+    print("Did it unhook?")
+    print(UnhookWindowsHookEx(keyboardhook))
+# atexit.register(UnhookWindowsHookEx, keyboardhook)
+
+
+atexit.register(unhook_register)
+print("begin")
+# Retrieves a message from the calling thread's message queue. The function dispatches incoming sent messages until
+# a posted message is available for retrieval
+GetMessage(LPMSG(), NULL, NULL, NULL)
+
+# while PeekMessage(LPMSG, NULL, NULL, NULL, NULL):
+#    print(LPMSG)
+
+print("end")
+
+
+
 
