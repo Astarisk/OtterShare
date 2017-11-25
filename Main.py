@@ -9,6 +9,10 @@ import win32ui
 import win32con
 import win32api
 
+import ctypes
+from ctypes import windll, byref, c_short, c_char, c_uint8, c_int32, c_int, c_uint, c_uint32, c_long, Structure, CFUNCTYPE, POINTER
+from ctypes.wintypes import WORD, DWORD, BOOL, HHOOK, MSG, LPWSTR, WCHAR, WPARAM, LPARAM, LONG, ULONG
+import atexit
 
 class MainFrame(wx.Frame):
 
@@ -20,64 +24,67 @@ class MainFrame(wx.Frame):
         self.Close(True)
 
 
-if __name__ == "__main__":
-    # Create the Main frame
+#if __name__ == "__main__":
+    #Create the Main frame
     #app = wx.App(False)
     #frame = MainFrame(None, title="Screenshotshare")
     #frame.Show()
     #app.MainLoop()
 
-    win32clipboard.OpenClipboard()
-    d = win32clipboard.GetClipboardData(win32con.CF_UNICODETEXT)
+# Let's see if I can get hooks working through my own efforts and not libraries.
+# Time to clutch tightly to the msdn... and pray It'll all work.
+# https://msdn.microsoft.com/en-us/library/windows/desktop/ms632589(v=vs.85).aspx
+user32 = ctypes.WinDLL('user32', use_last_error=True)
 
-    print(d)
+ULONG_PTR = POINTER(ULONG)
+NULL = c_int(0)
+WH_KEYBOARD_LL = c_int(13)  # WH_KEYBOARD_LL == 13
 
-    '''
-    https://msdn.microsoft.com/en-us/library/windows/desktop/dd183402(v=vs.85).aspx
-    To store an image temporarily, your application must call CreateCompatibleDC to create a DC that is compatible with
-    the current window DC. After you create a compatible DC, you create a bitmap with the appropriate dimensions by 
-    calling the CreateCompatibleBitmap function and then select it into this device context by calling the
-    SelectObject function.
-    '''
+# Invoke Windows API SetWindowsHookEx, CallNextHookEx, UnhookWindowsHookEx, and GetModuleHandle.
 
-    # Grab the width, Height, and Top Left of the screen -- This is for ALL monitors
-    # https://msdn.microsoft.com/en-us/library/windows/desktop/ms724385(v=vs.85).aspx
+# HHOOK WINAPI SetWindowsHookEx(_In_ int idHook, _In_ HOOKPROC lpfn, _In_ HINSTANCE hMod,_In_ DWORD dwThreadId);
+# https://msdn.microsoft.com/en-us/library/ms644990(VS.85).aspx
+SetWindowsHookEx = user32.SetWindowsHookExA  # # ExA = ANSI -- ExW = Unicode
+SetWindowsHookEx.restype = HHOOK  # restype sets the return type, by default it assume C int
 
-    width = win32api.GetSystemMetrics(win32con.SM_CXVIRTUALSCREEN)
-    height = win32api.GetSystemMetrics(win32con.SM_CYVIRTUALSCREEN)
-    left = win32api.GetSystemMetrics(win32con.SM_XVIRTUALSCREEN)
-    top = win32api.GetSystemMetrics(win32con.SM_YVIRTUALSCREEN)
+# LRESULT WINAPI CallNextHookEx(_In_opt_ HHOOK  hhk, _In_ int    nCode, _In_ PARAM wParam, _In_ LPARAM lParam);
+# https://msdn.microsoft.com/en-us/library/ms644974(v=vs.85).aspx
+CallNextHookEx = user32.CallNextHookEx
+CallNextHookEx.restype = c_int  # Keyboard events seem to return an int
 
-    savedir = 'c:\\users\\keith\\desktop\\screenshot.bmp'
+UnhookWindowsHookEx = user32.UnhookWindowsHookEx
+
+#LRESULT CALLBACK LowLevelKeyboardProc(
+#  _In_ int    nCode,
+#  _In_ WPARAM wParam,
+#  _In_ LPARAM lParam -- Pointer to KBDLLHOOKSTRUCT
+#);
+def low_level_handler(nCode, wParam, lParam):
+    print('n: ' + str(nCode))
+    print('w: ' + str(wParam))
+    print('l: ' + str(lParam) + ' ' + str(lParam.contents.vk_code))
+    # TODO: Read the docs and make this CallNextHook proper
+    return CallNextHookEx(NULL, nCode, wParam, lParam)
 
 
-    # Grabs the desktop window handle
-    desktophandle = win32gui.GetDesktopWindow()
-    windowrect = win32gui.GetClientRect(desktophandle)
+class KBDLLHOOKSTRUCT(ctypes.Structure):
+    _fields_ = [("vk_code", DWORD),
+                ("scan_code", DWORD),
+                ("flags", DWORD),
+                ("time", c_int),
+                ("dwExtraInfo", ULONG_PTR)]
 
-    # Create device contexts:
-    # A device context is a structure that defines a set of graphic objects
-    # and their associated attributes, as well as the graphic modes that affect output.
-    desktopcontext = win32gui.GetDC(desktophandle)
-    imgdc = win32ui.CreateDCFromHandle(desktopcontext)  # This is a PyCDC object, PyCDeviceContext
-    print(imgdc)
-    # Create memory device context, stores the bitmap until save
-    memdc = imgdc.CreateCompatibleDC()
-    print(memdc)
-    # Create bitmap object
-    screen = win32ui.CreateBitmap()
-    screen.CreateCompatibleBitmap(imgdc, width, height)
 
-    # Points the memdc to the newly created bitmap
-    memdc.SelectObject(screen)
+LowLevelKeyboardProc = CFUNCTYPE(c_int, c_int, LPARAM, POINTER(KBDLLHOOKSTRUCT))
+keyboardcallback = LowLevelKeyboardProc(low_level_handler)
 
-    # Copy from screen to new bitmap
-    # BitBlt(destPos, size, dc, srcPos, rop)
-    memdc.BitBlt((0, 0), (width, height), imgdc, (0, 0), win32con.SRCCOPY)
-    # save the bitmap to a file
-    screen.SaveBitmapFile(memdc, savedir)
+# HHOOK WINAPI SetWindowsHookEx(_In_ int idHook, _In_ HOOKPROC lpfn, _In_ HINSTANCE hMod,_In_ DWORD dwThreadId)
+keyboardhook = SetWindowsHookEx(WH_KEYBOARD_LL, keyboardcallback, NULL, NULL)
 
-    # free objects
-    memdc.DeleteDC()
-    win32gui.DeleteObject(screen.GetHandle())
+# Unregister the hook at exit
+atexit.register(UnhookWindowsHookEx, keyboardcallback)
 
+while True:
+    msg = windll.user32.GetMessageW(None, 0, 0, 0)
+    windll.user32.TranslateMessage(byref(msg))
+    windll.user32.DispatchMessageW(byref(msg))
