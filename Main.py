@@ -5,7 +5,7 @@ from ctypes import windll, byref, c_short, c_char, c_uint8, c_int32, c_int, c_ui
 from ctypes.wintypes import WORD, DWORD, BOOL, HHOOK, MSG, LPWSTR, WCHAR, WPARAM, LPARAM, LONG, ULONG
 import Screenshot
 import atexit
-
+from KeyboardEvent import KeykoardEvent as KeyboardEvent
 class MainFrame(wx.Frame):
 
     def __init__(self, *args, **kw):
@@ -115,18 +115,40 @@ PeekMessage = user32.PeekMessageW
 PeekMessage.argtypes = [LPMSG, c_int, c_int, c_int, c_int]
 PeekMessage.restype = BOOL
 
+handlers = []
+
+#modifier_keys = {
+#    0x010: 'Shift',
+#    0x011: 'Ctrl',
+#    0x012: 'Alt'
+#}
+
+SHIFT_DOWN = False
+CTRL_DOWN = False
+ALT_DOWN = False
+
 
 def listener():
     def low_level_handler(nCode, wParam, lParam):
+        #print('n: ' + str(nCode))
+        #print('w: ' + str(wParam))
+        #print('l: ' + str(lParam))
+
+        if lParam == 0x010:
+            if key_identifier[wParam] == 'Key Down':
+                SHIFT_DOWN = True
+            else:
+                SHIFT_DOWN = False
+
         if lParam.contents.vk_code in virtual_keys:
-            print('n: ' + str(nCode))
-            print('w: ' + str(key_identifier[wParam]))
-            print('l: ' + str(lParam) + ' ' + virtual_keys[lParam.contents.vk_code])
+            event = KeyboardEvent(key_identifier[wParam], virtual_keys[lParam.contents.vk_code])
+            for h in handlers:
+                h(event)
+
             if virtual_keys[lParam.contents.vk_code] == 'z':
                 sys.exit()
-            if virtual_keys[lParam.contents.vk_code] == 'p':
-                Screenshot.save_picture()
-
+            if virtual_keys[lParam.contents.vk_code] == 'p' and SHIFT_DOWN:
+                print("hello")
         print("Call next hook")
         # TODO: Read the docs and make this CallNextHook proper
         return CallNextHookEx(NULL, nCode, wParam, lParam)
@@ -160,6 +182,11 @@ def listener():
     GetMessage(LPMSG(), NULL, NULL, NULL)
 
 
+def print_event(e):
+    print(e)
+
+
+handlers.append(print_event)
 listener()
 
 
