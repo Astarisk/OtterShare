@@ -3,6 +3,8 @@ import win32ui
 import win32con
 import win32api
 
+from datetime import datetime
+
 '''
    https://msdn.microsoft.com/en-us/library/windows/desktop/dd183402(v=vs.85).aspx
    To store an image temporarily, your application must call CreateCompatibleDC to create a DC that is compatible with
@@ -13,13 +15,13 @@ import win32api
 
 # Grab the width, Height, and Top Left of the screen -- This is for ALL monitors
 # https://msdn.microsoft.com/en-us/library/windows/desktop/ms724385(v=vs.85).aspx
-def save_picture():
+def save_picture(savedir):
     width = win32api.GetSystemMetrics(win32con.SM_CXVIRTUALSCREEN)
     height = win32api.GetSystemMetrics(win32con.SM_CYVIRTUALSCREEN)
     left = win32api.GetSystemMetrics(win32con.SM_XVIRTUALSCREEN)
     top = win32api.GetSystemMetrics(win32con.SM_YVIRTUALSCREEN)
 
-    savedir = 'c:\\users\\keith\\desktop\\screenshot.bmp'
+    # savedir = 'c:\\users\\keith\\desktop\\screenshot.bmp'
 
     # Grabs the desktop window handle
     desktophandle = win32gui.GetDesktopWindow()
@@ -44,8 +46,11 @@ def save_picture():
     # Copy from screen to new bitmap
     # BitBlt(destPos, size, dc, srcPos, rop)
     memdc.BitBlt((0, 0), (width, height), imgdc, (0, 0), win32con.SRCCOPY)
+    # Generate the file name based on date and time
+    date = str(datetime.now())
+    filename = date[:10] + ' at ' + date[11:19].replace(':', '.')
     # save the bitmap to a file
-    screen.SaveBitmapFile(memdc, savedir)
+    screen.SaveBitmapFile(memdc, savedir + filename + '.bmp')
 
     # free objects
     memdc.DeleteDC()
