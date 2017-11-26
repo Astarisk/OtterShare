@@ -3,11 +3,9 @@ from ctypes import c_int, CFUNCTYPE, POINTER
 # windll, byref, c_short, c_char ,c_uint, c_uint8, c_int32, c_long, Structure,
 from ctypes.wintypes import DWORD, BOOL, HHOOK, MSG, LPARAM, ULONG
 #  WORD,  LPWSTR, WCHAR, WPARAM,  LONG,
-import Screenshot
 import atexit
 import sys
 from KeyboardEvent import KEY_DOWN, KEY_UP, KeykoardEvent as KeyboardEvent
-import Config
 
 # Let's see if I can get hooks working through my own efforts and not libraries.
 # Time to clutch tightly to the msdn... and pray It'll all work.
@@ -130,10 +128,6 @@ def listener():
     def process_event(event):
         for h in handlers:
             h(event)
-        if event.name == 'z':
-            sys.exit()
-        if event.name == 'p':
-            Screenshot.save_picture(Config.save_location, Config.save_as_png == 'True')
 
     def low_level_handler(nCode, wParam, lParam):
         #print(lParam.contents.vk_code)
@@ -143,7 +137,7 @@ def listener():
             #if virtual_keys[lParam.contents.vk_code] == 'p' and SHIFT_DOWN:
             #    print("hello")
             process_event(event)
-        print("Call next hook")
+        #print("Call next hook")
         # TODO: Read the docs and make this CallNextHook proper
         return CallNextHookEx(NULL, nCode, wParam, lParam)
 
@@ -176,11 +170,9 @@ def listener():
     GetMessage(LPMSG(), NULL, NULL, NULL)
 
 
-def print_event(e):
-    print(e)
+def add_handler(handler):
+    handlers.append(handler)
 
-
-handlers.append(print_event)
 
 
 
