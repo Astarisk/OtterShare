@@ -19,8 +19,13 @@ def upload_img(img, client_id):
     # TODO: Add in error checking based upon response code
     # <Response [200]>
     js = response.json()
-    # TODO: Save link + delete hash to a file.
-    save_to_clipboard(js['data']['link'])
+
+    if response.status_code == 500:
+        print("Imgur is broken.")
+    if response.status_code == 200:
+        save_to_clipboard(js['data']['link'])
+        with open("url_links.txt", "a") as file:
+            file.write(js['data']['link'] + " " + js['data']['deletehash'] + '\n')
 
 
 def save_to_clipboard(url):

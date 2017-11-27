@@ -168,13 +168,13 @@ def listener():
 
 def add_to_set(event):
     if event.event_type == KEY_DOWN:
-        print("Added:" + str(event.event_type) + " " + str(keys_down))
+        # print("Added:" + str(event.event_type) + " " + str(keys_down))
         keys_down.add(event.name)
 
 
 def remove_from_set(event):
     if event.event_type == KEY_UP:
-        print("Removed:" + str(event.event_type) + " " + str(keys_down))
+        # print("Removed:" + str(event.event_type) + " " + str(keys_down))
         keys_down.remove(event.name)
 
 
@@ -182,11 +182,5 @@ def add_handler(handler):
     handlers.append(handler)
 
 
-
 add_handler(add_to_set)
 add_handler(remove_from_set)
-
-
-
-
-
