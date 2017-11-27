@@ -5,7 +5,7 @@ from ctypes.wintypes import DWORD, BOOL, HHOOK, MSG, LPARAM, ULONG
 #  WORD,  LPWSTR, WCHAR, WPARAM,  LONG,
 import atexit
 import sys
-from KeyboardEvent import KEY_DOWN, KEY_UP, KeykoardEvent as KeyboardEvent
+from KeyboardEvent import KEY_DOWN, KEY_UP, KeyboardEvent as KeyboardEvent
 
 # Let's see if I can get hooks working through my own efforts and not libraries.
 # Time to clutch tightly to the msdn... and pray It'll all work.
@@ -120,7 +120,8 @@ SHIFT_DOWN = False
 CTRL_DOWN = False
 ALT_DOWN = False
 
-keys_down = {}
+lock = False
+keys_down = set([])
 
 
 def listener():
@@ -130,14 +131,10 @@ def listener():
             h(event)
 
     def low_level_handler(nCode, wParam, lParam):
-        #print(lParam.contents.vk_code)
         if lParam.contents.vk_code in virtual_keys:
             event = KeyboardEvent(key_identifier[wParam], virtual_keys[lParam.contents.vk_code])
 
-            #if virtual_keys[lParam.contents.vk_code] == 'p' and SHIFT_DOWN:
-            #    print("hello")
             process_event(event)
-        #print("Call next hook")
         # TODO: Read the docs and make this CallNextHook proper
         return CallNextHookEx(NULL, nCode, wParam, lParam)
 
@@ -159,8 +156,7 @@ def listener():
 
     # Unregister the hook at exit
     def unhook_register():
-        print("Did it unhook?")
-        print(UnhookWindowsHookEx(keyboardhook))
+        UnhookWindowsHookEx(keyboardhook)
 
     # atexit.register(UnhookWindowsHookEx, keyboardhook)
     atexit.register(unhook_register)
@@ -170,11 +166,25 @@ def listener():
     GetMessage(LPMSG(), NULL, NULL, NULL)
 
 
+def add_to_set(event):
+    if event.event_type == KEY_DOWN:
+        print("Added:" + str(event.event_type) + " " + str(keys_down))
+        keys_down.add(event.name)
+
+
+def remove_from_set(event):
+    if event.event_type == KEY_UP:
+        print("Removed:" + str(event.event_type) + " " + str(keys_down))
+        keys_down.remove(event.name)
+
+
 def add_handler(handler):
     handlers.append(handler)
 
 
 
+add_handler(add_to_set)
+add_handler(remove_from_set)
 
 
 

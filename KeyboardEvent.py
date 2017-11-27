@@ -2,7 +2,7 @@ KEY_DOWN = 'down'
 KEY_UP = 'up'
 
 
-class KeykoardEvent(object):
+class KeyboardEvent(object):
 
     def __init__(self, event_type, name):
         self.event_type = event_type

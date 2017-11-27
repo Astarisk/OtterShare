@@ -5,6 +5,7 @@ from io import BytesIO
 
 url = "https://api.imgur.com/3/image"
 
+
 def upload_img(img, client_id):
     buffered = BytesIO()
     img.save(buffered, format="png")
