@@ -16,11 +16,11 @@ save_hotkey: This supports multiple key presses, but only alt, ctrl, shift, and 
 That's all there is for now to worry about. I'll keep the README up to date as I move along with the project
 
 Future plans:
-Minimize the application to system tray.
-Clean up and improve upon keyboard handling.
-Upload a file from a folder.
-imgur oath and album support.
-File naming, tagging, and all the nice organizational things.
-Try to capture only the active window at the time.
-Select area of the screen to take picture of.
-Integrate a few other utilities into this application, things that I might find fun to keep track of.
+Minimize the application to system tray.  
+Clean up and improve upon keyboard handling.  
+Upload a file from a folder.  
+imgur oath and album support.  
+File naming, tagging, and all the nice organizational things.  
+Try to capture only the active window at the time.  
+Select area of the screen to take picture of.  
+Integrate a few other utilities into this application, things that I might find fun to keep track of.  
