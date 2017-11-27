@@ -6,7 +6,7 @@ from io import BytesIO
 url = "https://api.imgur.com/3/image"
 
 
-def upload_img(img, client_id):
+def upload_img(img, client_id, save_dir):
     buffered = BytesIO()
     img.save(buffered, format="png")
 
@@ -24,7 +24,7 @@ def upload_img(img, client_id):
         print("Imgur is broken.")
     if response.status_code == 200:
         save_to_clipboard(js['data']['link'])
-        with open("url_links.txt", "a") as file:
+        with open(save_dir + "url_links.txt", "a") as file:
             file.write(js['data']['link'] + " " + js['data']['deletehash'] + '\n')
 
 

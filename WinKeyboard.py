@@ -1,11 +1,11 @@
 import ctypes
 from ctypes import c_int, CFUNCTYPE, POINTER
-# windll, byref, c_short, c_char ,c_uint, c_uint8, c_int32, c_long, Structure,
 from ctypes.wintypes import DWORD, BOOL, HHOOK, MSG, LPARAM, ULONG
-#  WORD,  LPWSTR, WCHAR, WPARAM,  LONG,
 import atexit
-import sys
 from KeyboardEvent import KEY_DOWN, KEY_UP, KeyboardEvent as KeyboardEvent
+import win32con
+import win32gui
+import win32api
 
 # Let's see if I can get hooks working through my own efforts and not libraries.
 # Time to clutch tightly to the msdn... and pray It'll all work.
@@ -102,6 +102,7 @@ PeekMessage = user32.PeekMessageW
 PeekMessage.argtypes = [LPMSG, c_int, c_int, c_int, c_int]
 PeekMessage.restype = BOOL
 
+
 handlers = []
 
 #modifier_keys = {
@@ -125,6 +126,7 @@ keys_down = set([])
 
 
 def listener():
+    print("Listening..")
 
     def process_event(event):
         for h in handlers:
@@ -156,14 +158,15 @@ def listener():
 
     # Unregister the hook at exit
     def unhook_register():
+        print('unhooked')
         UnhookWindowsHookEx(keyboardhook)
 
     # atexit.register(UnhookWindowsHookEx, keyboardhook)
     atexit.register(unhook_register)
 
     # Retrieves a message from the calling thread's message queue. The function dispatches incoming sent messages until
-    # a posted message is available for retrieval
-    GetMessage(LPMSG(), NULL, NULL, NULL)
+    # a posted message is available for retrieval\
+    win32gui.PumpMessages()
 
 
 def add_to_set(event):
@@ -181,6 +184,9 @@ def remove_from_set(event):
 def add_handler(handler):
     handlers.append(handler)
 
+
+def stop_pumping(thread_id):
+    win32api.PostThreadMessage(thread_id, win32con.WM_QUIT, 0, 0)
 
 add_handler(add_to_set)
 add_handler(remove_from_set)
