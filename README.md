@@ -1,7 +1,7 @@
 # OtterShare
 Attempting to create my own screenshot sharing program to replace what I've been using for years.
 
-Notes about the program thus far and some details:
+Notes about the program thus far and some details:  
 THIS PROGRAM ONLY WORKS ON WINDOWS NT PLATFORMS  
 The images are saved as a png, and can be told to upload the image to imgur, after the upload is done the url is copied to your clipboard. The url and delete hash is then saved to a local text file for
 future usages.

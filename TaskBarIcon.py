@@ -15,7 +15,7 @@ class TaskBarIcon(wx.adv.TaskBarIcon):
         self.icon = wx.Icon()
         self.icon.CopyFromBitmap(bmp)
 
-        self.SetIcon(self.icon, "Restore")
+        self.SetIcon(self.icon, "OtterShare")
         self.Bind(wx.adv.EVT_TASKBAR_RIGHT_UP, self.OnTaskBarRightClick)
 
     def OnTaskBarRightClick(self, event):
