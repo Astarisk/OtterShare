@@ -1,6 +1,6 @@
 import ctypes
 from ctypes import c_int, CFUNCTYPE, POINTER
-from ctypes.wintypes import DWORD, BOOL, HHOOK, MSG, LPARAM, ULONG
+from ctypes.wintypes import DWORD, BOOL, HHOOK, MSG, LPARAM, ULONG, POINT, UINT, HWND
 import atexit
 from KeyboardEvent import KEY_DOWN, KEY_UP, KeyboardEvent as KeyboardEvent
 import win32con
@@ -25,8 +25,16 @@ class KBDLLHOOKSTRUCT(ctypes.Structure):
                 ("time", c_int),
                 ("dwExtraInfo", ULONG_PTR)]
 
+# https://msdn.microsoft.com/en-us/library/windows/desktop/ms644968(v=vs.85).aspx
+class tagMOUSEHOOKSTRUCT(ctypes.Structure):
+    _fields_ = [("pt", POINT),
+                ("hwnd", HWND),
+                ("wHitTestCode", UINT),
+                ("dwExtraInfo", ULONG_PTR)]
+
 
 WH_KEYBOARD_LL = c_int(13)  # WH_KEYBOARD_LL == 13
+WH_MOUSE_LL = c_int(14)
 
 WM_KEYDOWN = 0X0100
 WM_KEYUP = 0X0101
@@ -132,12 +140,17 @@ def listener():
         for h in handlers:
             h(event)
 
-    def low_level_handler(nCode, wParam, lParam):
+    def low_level_keyboard_handler(nCode, wParam, lParam):
         if lParam.contents.vk_code in virtual_keys:
             event = KeyboardEvent(key_identifier[wParam], virtual_keys[lParam.contents.vk_code])
 
             process_event(event)
         # TODO: Read the docs and make this CallNextHook proper
+        return CallNextHookEx(NULL, nCode, wParam, lParam)
+
+    def low_level_mouse_handler(nCode, wParam, lParam):
+        print(nCode, wParam, lParam)
+        print("lparam: " + str(lParam.contents.pt.x) + "," + str(lParam.contents.pt.y))
         return CallNextHookEx(NULL, nCode, wParam, lParam)
 
     # Low level handler signature
@@ -150,16 +163,22 @@ def listener():
     # );
     CMPFUNC = CFUNCTYPE(c_int, c_int, LPARAM, POINTER(KBDLLHOOKSTRUCT))
     # Converts it to a C pointer
-    keyboardcallback = CMPFUNC(low_level_handler)
+    keyboardcallback = CMPFUNC(low_level_keyboard_handler)
+
+    CMPFUNC = CFUNCTYPE(c_int, c_int, LPARAM, POINTER(tagMOUSEHOOKSTRUCT))
+    mousecallback = CMPFUNC(low_level_mouse_handler)
 
     # HHOOK WINAPI SetWindowsHookEx(_In_ int idHook, _In_ HOOKPROC lpfn, _In_ HINSTANCE hMod,_In_ DWORD dwThreadId)
     # https://msdn.microsoft.com/en-us/library/ms644990(v=vs.85).aspx
     keyboardhook = SetWindowsHookEx(WH_KEYBOARD_LL, keyboardcallback, NULL, NULL)
 
+    mousehook = SetWindowsHookEx(WH_MOUSE_LL, mousecallback, NULL, NULL)
+
     # Unregister the hook at exit
     def unhook_register():
         print('unhooked')
         UnhookWindowsHookEx(keyboardhook)
+        UnhookWindowsHookEx(mousehook)
 
     # atexit.register(UnhookWindowsHookEx, keyboardhook)
     atexit.register(unhook_register)
@@ -186,7 +205,9 @@ def add_handler(handler):
 
 
 def stop_pumping(thread_id):
+    # Posts a Quit message to the message queue
     win32api.PostThreadMessage(thread_id, win32con.WM_QUIT, 0, 0)
+
 
 add_handler(add_to_set)
 add_handler(remove_from_set)
