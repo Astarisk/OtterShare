@@ -11,7 +11,8 @@ keys = {
     'save_hotkey': 'ctrl+shift+e',
     'save_location':  os.getcwd() + '\\testsaves\\',
     'save_img': 'True',
-    'upload_img': 'True'
+    'upload_img': 'True',
+    'area_select_picture': 'ctrl+shift+t'
 }
 
 

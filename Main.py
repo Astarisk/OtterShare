@@ -1,12 +1,16 @@
 import wx
-import WinKeyboard
 import Config
 import Screenshot
 import ImageUpload
 import threading
 import os
+import InputManager
 from KeyboardEvent import KEY_DOWN, KEY_UP, KeyboardEvent as KeyboardEvent
 from TaskBarIcon import TaskBarIcon
+from WinMouse import WinMouse
+from WinKeyboard import WinKeyboard
+
+
 
 # TODO: Make sure only a windows OS loads this
 class MainFrame(wx.Frame):
@@ -35,19 +39,26 @@ class MainFrame(wx.Frame):
         self.Bind(wx.EVT_CLOSE, self.OnClose)
 
         self.Show()
+
         # Add some events to the keyboard
         #WinKeyboard.add_handler(print_event)
-        WinKeyboard.add_handler(screenshot_handler)
-        # Start listening on keystrokes
-        self.worker = None
+        #WinKeyboard.add_handler(screenshot_handler)
+
+        #InputManager.add_hook(self.mouse.generate_hook())
+
+        # Start listening on input
+        worker = None
+        InputManager.add_input(WinMouse())
+        InputManager.add_input(WinKeyboard())
+
         # Split the Message Pumping onto its own thread.
-        if not self.worker:
-            self.worker = threading.Thread(target=WinKeyboard.listener())
-            #self.worker.start()
+        if not worker:
+            worker = threading.Thread(target=InputManager.listener())
+            worker.start()
 
     def OnClose(self, event):
         # Sends a stop pumping message
-        WinKeyboard.stop_pumping(threading.get_ident())
+        InputManager.stop_pumping(threading.get_ident())
         self.tbIcon.RemoveIcon()
         self.tbIcon.Destroy()
         self.Destroy()
@@ -68,6 +79,7 @@ class Tab(wx.Panel):
         text = wx.StaticText(box, wx.ID_ANY, "This window is a child of the staticbox")
         text = wx.StaticText(box, wx.ID_ANY, "Meh")
 
+
 def print_event(event):
     print(event)
 
@@ -76,9 +88,10 @@ def screenshot_handler(event):
     # TODO: Work on the Keyboard so it's more flexible in regards to key pressing.
     if event.event_type == KEY_UP and event.name in Config.get_save_hotkey():
         WinKeyboard.lock = False
-
+    print(event)
     if set(Config.get_save_hotkey()) == set(WinKeyboard.keys_down) and not WinKeyboard.lock:
         WinKeyboard.lock = True
+
         img = Screenshot.take_picture()
 
         if Config.get_save_img:
@@ -88,7 +101,6 @@ def screenshot_handler(event):
 
 
 def main():
-    # Add some events to the keyboard
     #Create the Main frame
     if os.name != 'nt':
         print('This application is not supported on: ' + os.name)
