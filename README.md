@@ -1,5 +1,5 @@
 # OtterShare
-Attempting to create my own screenshot sharing program to replace what I've been using for years.
+Attempting to create my own screenshot sharing program to replace what I've been using for years. I wanted to mess with the windows hooks and c_types so I decided to try this out.
 
 Notes about the program thus far and some details:  
 THIS PROGRAM ONLY WORKS ON WINDOWS NT PLATFORMS  
