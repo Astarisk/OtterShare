@@ -2,7 +2,7 @@
 
 A Windows screenshot-sharing experiment in Python. I wanted to build my own screenshot utility and explore Windows input hooks and `ctypes` along the way.
 
-This is an older, unfinished desktop project. The capture, upload, and input-handling pieces are useful to explore, but the current checkout needs repair before it works as a complete screenshot utility.
+An older personal project exploring desktop tooling, image sharing, and native Windows APIs.
 
 ## What's here
 
@@ -20,8 +20,8 @@ Read [Screenshot.py](Screenshot.py) for capture and PNG saving, [ImageUpload.py]
 
 The configuration includes an Imgur `client_id`, a save directory, and a default screenshot shortcut of `ctrl+shift+e`. Uploading requires your own Imgur application ID. The save directory must exist.
 
-## Current rough edges
+## Project status
 
-The screenshot handler's registration is commented out in `Main.py`. The listener is also invoked while constructing its worker thread, and the screenshot handler checks configuration functions without calling them. These need attention before the hotkey and save/upload toggles can be relied on.
+This is an unfinished experiment. The screenshot hotkey wiring and parts of the input, configuration, and shutdown handling need repair before the pieces work together as a complete utility.
 
-The original ideas included area selection, active-window capture, file uploads, and better image organization. They remain ideas rather than completed features. The tray icon is implemented; shutdown handling still has unfinished work.
+Ideas for further exploration included area selection, active-window capture, file uploads, and image organization; these were not completed.
